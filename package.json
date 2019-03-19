@@ -1,0 +1,14 @@
+{
+  "name": "YWCA_ServiceApp",
+  "version": "1.0.0",
+  "description": "Allow users to view available activities for their chapter",
+  "main": "index.js",
+  "repository": "https://github.com/qtn2932/YWCA_ServiceApp.git",
+  "author": "qtn2932 <quan.nguyen199712@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@material-ui/core": "^3.9.2",
+    "create-react-app": "^2.1.8",
+    "react": "^16.8.4"
+  }
+}
