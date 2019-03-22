@@ -7,282 +7,320 @@ import { withStyles } from '@material-ui/core/styles';
 import withRoot from './withRoot';
 import Axios from 'axios';
 import Select from 'react-select';
-import logo from "./assest/YWCA_LOGO.png"
+import logo from "./assest/YWCA_LOGO.png";
+import ChapterCard from "./chapterCard";
+import CategoryCard from "./categoryCard";
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Grid from '@material-ui/core/Grid';
 
 const styles = theme => ({
   root: {
     margin: "0 auto",
-    frontSize:"62.5%"
+    frontSize: "62.5%"
   },
-  header:{
-    display:"flex",
-    justifyContent:"space-around",
-  },
-
-  logo:{
-    width:"20%",
-    height:"auto",
-    alignSelf:"flex-start",
-    marginTop:"5px",
-  },
-  AppBar:{
-    backgroundColor:"pink",
-    width:"100%",
-    marginBottom:"20px",
-    alignSelf:"center",
-    display:"flex",
-    justifyContent:"center",
-    borderRadius:"4px",
-    padding:"5px"
-  },
-  title:{
-    alignSelf:"baseline",
-    marginTop:"30px",
-    color:"#FA4616",
-    fontSize:"2rem",
-
-  },
-  sericePaper:{
-    width:"30%",
-    height:"100px",
-    padding:"2%",
-    marginRight:"3%",
-    marginBottom:"20px"
-  },
-  serviceView:{
-    width:"100%",
-    display:"flex",
-    flexWrap:"wrap"
-  },
-  selectTable: {
-    marginBottom: "20px"
-  },
-  mainContainer: {
-    margin: '0 auto',
-    width: '500px',
-  },
-  innerContainer: {
-    width: '1080px',
-    margin: '50px auto'
-  },
-  paper: {
+  appPaper: {
+    width: "50%",
+    margin: "50px auto",
     padding: 20,
     background: 'linear-gradient(to bottom, #ffcccc 0%, #ff9933 100%)',
-    display:"flex",
-    flexWrap:"wrap",
-    justifyContent:"center",
-    height:"700px"
+    height: "auto",
+    display: "flex",
+    flexWrap: "wrap",
   },
-  text: {
-    paddingBottom: 70,
-    fontSize: "22px"
+  stateView: {
+    padding: "10px"
   },
-  textTitle: {
-    paddingBottom: 20,
-    fontSize: "22px"
+  header: {
+    display: "flex",
+    justifyContent: "space-between",
+    paddingLeft: "3%",
+    paddingRight: "5%",
+    marginBottom: "40px"
   },
-  button: {
-    padding: 15,
-    width: "100%"
+  logo: {
+    width: "20%",
+    height: "auto",
+    alignSelf: "flex-start",
+    marginTop: "5px",
+  },
+  title: {
+    alignSelf: "baseline",
+    marginTop: "30px",
+    color: "#FA4616",
+    fontSize: "2rem",
+    fontWeight: "bold",
+    width: "60%"
+  },
+  bodyContainer: {
+    display: "flex",
+    width: "100%",
+    flexWrap: "wrap",
+  },
+
+  selectState: {
+    marginBottom: "20px",
+    width: "50%"
+  },
+  stateText: {
+    width: "100%",
+    marginBottom: "10px",
+    color: "#FA4616",
+  },
+  textYMCA: {
+    display: "flex",
+    width: "100%",
+    flexWrap: "wrap",
+  },
+  selectYMCA: {
+    width: "100%",
+    marginBottom: "10px",
+    color: "#FA4616",
+  },
+  CategoryCardContainer: {
+    width: "100%",
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "space-around",
+  },
+  selectCategory: {
+    width: "100%",
+    marginBottom: "10px",
+    color: "#FA4616",
+  },
+  serviceCard: {
+    height: "70px",
+    marginRight: "5%",
+    marginBottom: "10px",
+    padding: "5px",
+  },
+  selectServices: {
+    width: "100%",
+    marginBottom: "10px",
+    color: "#FA4616",
   }
 });
 
 class App extends React.Component {
   state = {
-    chapters: [],
     chapterName: [],
+    selected: null,
+    selectedChapter: null,
+    states: [],
     categories: [],
     categoriesName: [],
-    selected: null,
     isClearable: true,
     isDisable: false,
     isLoadingChapters: true,
     isLoadingCategories: true,
+    isLoadingStates: true,
     isSearchable: true,
     selectedCategory: "Health and Wellness",
     availableActivities: [],
-    noService: false
+    stateDisplayed: false,
+    categoriesDisplayed: false,
+    servicesDisplayed: false,
+    categoryService: [],
+    chapterService: [],
+    isLoadingServices: true,
+    chapterServiceDisplay: false,
+
   };
+  setCategoryServices = (data) => {
+    console.log("hello this")
+    this.setState({ categoryService: data })
+  }
+  setChapterServices = (data) => {
+    this.setState({ chapterService: data, chapterServiceDisplay: true })
+  }
   handleChange = (selected) => {
     this.setState({ selected });
-  }
-  handleCatChange = (selectedCategory) => {
-    this.setState({ selectedCategory })
-  }
-  handleViewServices = () => {
-    const { selected, chapters, categories, selectedCategory } = this.state
-    const tempHolder = []
-    for (let i = 0; i < chapters.length; i++) {
-      console.log("really im here")
-      console.log(selected.label)
-      console.log(chapters[i].Chapters)
-      if (chapters[i].Chapters === selected.label) {
-        for (let z = 0; z < categories.length; z++) {
-          console.log("im here tho")
-          if (categories[z].Name === selectedCategory.label) {
-            console.log("im here")
-            console.log(selectedCategory.label)
-            for (let x = 0; x < chapters[i].Services.length; x++) {
-              for (let y = 0; y < categories[z].Service.length; y++) {
-                if (chapters[i].Services[x] === categories[z].Service[y]) {
-                  if (!tempHolder.includes(chapters[i].Services[x])) {
-                    tempHolder.push(chapters[i].Services[x])
-                  }
-                }
-              }
-            }
-          }
+    if (selected != null) {
+      Axios.get("https://ywca-service-api.herokuapp.com/state/chapters", {
+        headers: {
+          state: selected.value
         }
-        break;
-      }
-
-    }
-    this.setState({ availableActivities: tempHolder })
-    if (tempHolder.length === 0) {
-      console.log("is this true?")
-      this.setState({ noService: true })
-    }
-    else {
-      this.setState({ noService: false })
-    }
-  }
-  handleClose = () => {
-    this.setState({
-      open: false,
-    });
-  };
-  handleTabChange = (event, value) => {
-    this.setState({
-      ...this.state,
-      selectedCategory: value
-    })
-  }
-  handleClick = () => {
-    this.setState({
-      open: true,
-      anchorEl: null,
-    });
-  };
-  handleClick = event => {
-    this.setState({ anchorEl: event.currentTarget });
-  };
-  handleClose = () => {
-    this.setState({ anchorEl: null });
-  };
-  componentDidMount() {
-    Axios.get('https://ywca-service-api.herokuapp.com/chapters/name')
-      .then(res => {
+      }).then(res => {
+        console.log(res.data[0].Name)
         const tempHolder = [];
-        res.data.forEach(element => {
-          tempHolder.push({
-            value: element, label: element
-          })
+        res.data[0].Name.forEach(element => {
+          tempHolder.push(element)
         });
         this.setState({
           ...this.state,
           chapterName: tempHolder,
-          isLoadingChapters: false
+          stateDisplayed: true
         })
       })
-    Axios.get('https://ywca-service-api.herokuapp.com/categories')
+    } else {
+      this.setState({ chapterName: [] })
+    }
+  }
+  setCategory = (data) => {
+    this.setState({ categories: data, categoriesDisplayed: true })
+  }
+  setServices = (data) => {
+    this.setState({ availableActivities: data, servicesDisplayed: true })
+  }
+  setSelectedChapter = (selectedChapter) => {
+    this.setState({ selectedChapter: selectedChapter })
+  }
+  findService = () => {
+    let tempHolder = []
+    // if (this.state.categoryService.length > 0 && this.state.chapterService.length > 0) {
+    for (let i = 0; i < this.state.categoryService.length; i++) {
+      for (let z = 0; z < this.state.chapterService.length; z++) {
+        if (this.state.categoryService[i] === this.state.chapterService[z]) {
+          tempHolder.push(this.state.categoryService[i])
+        }
+      }
+    }
+    this.setState({ availableActivities: tempHolder, isLoadingServices: false })
+    // }
+    // else {
+    //   setTimeout(this.findService, 200)
+    // }
+  }
+  resetHandle = () => {
+    this.setState({
+      chapterName: [],
+      selected: null,
+      selectedChapter: null,
+      categories: [],
+      categoriesName: [],
+      isClearable: true,
+      isDisable: false,
+      isLoadingChapters: true,
+      isLoadingCategories: true,
+      isSearchable: true,
+      selectedCategory: "Health and Wellness",
+      availableActivities: [],
+      stateDisplayed: false,
+      categoriesDisplayed: false,
+      servicesDisplayed: false,
+      categoryService: [],
+      chapterService: [],
+      isLoadingServices: true,
+      chapterServiceDisplay: false,
+    })
+  }
+  componentDidMount() {
+
+
+    Axios.get('https://ywca-service-api.herokuapp.com/states')
       .then(res => {
-        const tempHolder = [];
+        let tempHolder = [];
+        let sorted = [];
         res.data.forEach(element => {
+          sorted.push(element);
+        })
+        sorted.sort();
+        sorted.forEach(element => {
           tempHolder.push({
-            value: element.Name, label: element.Name
+            value: element, label: element
           })
         })
         this.setState({
           ...this.state,
-          categories: res.data,
-          categoriesName: tempHolder,
-          isLoadingCategories: false
-        })
-      })
-    Axios.get('https://ywca-service-api.herokuapp.com/chapters')
-      .then(res => {
-        // const tempHolder = [];
-        // res.data.forEach(element => {
-        //   tempHolder.push({
-        //     chapter: element.Name, service: element.ServiceName
-        //   })
-        // })
-        this.setState({
-          ...this.state,
-          chapters: res.data,
+          states: tempHolder,
+          isLoadingStates: false
         })
       })
   }
   render() {
     const {
       chapterName,
-      categoriesName,
-      selected,
       isClearable,
       isDisable,
-      isLoadingChapters,
-      isLoadingCategories,
+      isLoadingStates,
       isSearchable,
-      selectedCategory,
-      availableActivities
+      states,
+      selected
     } = this.state;
     const { classes } = this.props;
-    if (availableActivities.length < 1) {
 
-    }
     return (
       <div className={classes.root}>
-        <div className={classes.innerContainer}>
-          <Paper className={classes.paper}>
+        <Paper className={classes.appPaper}>
           <div className={classes.header}>
-             <img className={classes.logo} src={logo} alt="logo"/>
+            <img className={classes.logo} src={logo} alt="logo" />
             <Typography className={classes.title} variant="title">YWCA National Program Inventory</Typography>
           </div>
-         
-            
-
-            <Typography className={classes.chapter}
-              variant='h5'>YWCA Local Association:</Typography>
+          <div className={classes.bodyContainer}>
+            <Typography className={classes.stateText}
+              variant='h5'>State:</Typography>
             <Select
-              className={classes.selectTable}
-              defaultValue={chapterName[0]}
+              defaultValue={states[0]}
+              className={classes.selectState}
               isDisabled={isDisable}
-              isLoading={isLoadingChapters}
+              isLoading={isLoadingStates}
               isClearable={isClearable}
               isSearchable={isSearchable}
-              name="chapters"
-              options={chapterName}
+              name="state"
+              options={states}
               onChange={this.handleChange}
               value={selected}
-              placeholder="Select a chapter"
+              placeholder="Type to Search"
             />
-            <Typography className={classes.textTitle}
-              variant='h5'>Programs:</Typography>
-            <Select
-              className={classes.selectTable}
-              defaultValue={categoriesName[0]}
-              isDisabled={isDisable}
-              isLoading={isLoadingCategories}
-              isClearable={isClearable}
-              isSearchable={isSearchable}
-              name="categories"
-              options={categoriesName}
-              onChange={this.handleCatChange}
-              value={selectedCategory}
-              placeholder="Select a category"
-            />
-            <Button onClick={this.handleViewServices}>View Services</Button>
-            <div className={classes.serviceView}>
-              {this.state.noService && (
-                <Paper className={classes.sericePaper}>No Service available for this category</Paper>
-              )}
-              {this.state.availableActivities.map(element => (
-                <Paper className={classes.sericePaper}>{element}</Paper>
-              ))}
-            </div>
+          </div>
+          <div className={classes.textYMCA}>{this.state.stateDisplayed && (
+            <Typography className={classes.selectYMCA}
+              variant='h5'>Select YWCA Local Associations:</Typography>
+          )}</div>
 
-          </Paper>
-        </div>
+          <Grid container spacing={24} className={classes.stateView}>
+            {chapterName.map(element =>
+              <Grid item xs={4}>
+                <ChapterCard
+                  setCategory={this.setCategory}
+                  setSelectedChapter={this.setSelectedChapter}
+                  class={classes.ChapterCard} element={element} />
+              </Grid>
+            )}
+            <div className={classes.hiddenItem}></div>
+          </Grid>
+            {this.state.categoriesDisplayed && (
+              <div>
+                <Typography className={classes.selectCategory}
+                  variant='h5'>Select a Program:</Typography>
+                <Grid container xs={24} >
+                  {this.state.categories.map(element =>
+                    <Grid item xs={4}><CategoryCard element={element}
+                      selectedChapter={this.state.selectedChapter}
+                      setServices={this.setServices}
+                      setCategoryServices={this.setCategoryServices}
+                      setChapterServices={this.setChapterServices}
+                      findService={this.findService}
+                    /></Grid>
+
+                  )}
+                </Grid>
+
+              </div>
+            )}
+            <div>
+              {this.state.chapterServiceDisplay && (
+                <div>
+                  <Typography className={classes.selectServices} variant='h5'>
+                    Available Services:
+                      </Typography>
+                  {this.state.isLoadingServices && (
+                    <CircularProgress />
+                  )}
+                  {!this.state.isLoadingServices && (
+                    <Grid container xs={24} className={classes.stateView}>
+                      {this.state.availableActivities.map(element =>
+                        <Grid item xs={4}>
+                          <Paper className={classes.serviceCard}>{element}</Paper>
+                        </Grid>
+                      )}
+                    </Grid>
+
+                  )}
+                </div>
+              )}
+            </div>
+          
+        </Paper>
       </div>
     );
   }
