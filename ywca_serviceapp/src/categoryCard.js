@@ -35,16 +35,20 @@ class CategoryCard extends React.Component {
                 this.setState({ bgColor: 'white' })
             }, 100)
         }
-        let tempHolder=[]
-        for(let i=0; i<this.state.chapterServices.length; i++){
-            for(let z=0; z<this.state.categoryServices.length;z++){
-                if(this.state.chapterServices[i]===this.state.categoryServices[i]){
-                    tempHolder.push(this.state.chapterServices[i])
-                }
-            }
-        }
-        console.log(tempHolder)
         this.props.findService()
+        this.recallCategory()
+    }
+    recallCategory=()=>{
+        Axios.get('https://ywca-service-api.herokuapp.com/categories/services', {
+            headers: {
+                category: this.props.element
+            }
+        })
+            .then(res => {
+                this.setState({ categoryServices: res.data[0] })
+                console.log(this.state.categoryServices)
+                this.props.setCategoryServices(this.state.categoryServices)
+            })
     }
     componentDidMount(){
         Axios.get('https://ywca-service-api.herokuapp.com/chapters/services', {
@@ -57,16 +61,7 @@ class CategoryCard extends React.Component {
                 console.log(this.state.chapterServices)
                 this.props.setChapterServices(this.state.chapterServices)
             })
-        Axios.get('https://ywca-service-api.herokuapp.com/categories/services', {
-            headers: {
-                category: this.props.element
-            }
-        })
-            .then(res => {
-                this.setState({ categoryServices: res.data[0] })
-                console.log(this.state.categoryServices)
-                this.props.setCategoryServices(this.state.categoryServices)
-            })
+        this.recallCategory()
         Axios.get('https://ywca-service-api.herokuapp.com/categories/icon',{
             headers:{
                 category:this.props.element

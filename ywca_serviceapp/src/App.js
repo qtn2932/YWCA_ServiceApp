@@ -164,7 +164,11 @@ class App extends React.Component {
   setSelectedChapter = (selectedChapter) => {
     this.setState({ selectedChapter: selectedChapter })
   }
+  setSelectedCategory=(selectCategory)=>{
+    this.setState({selectCategory})
+  }
   findService = () => {
+    console.log("called")
     let tempHolder = []
     // if (this.state.categoryService.length > 0 && this.state.chapterService.length > 0) {
     for (let i = 0; i < this.state.categoryService.length; i++) {
@@ -278,48 +282,39 @@ class App extends React.Component {
             )}
             <div className={classes.hiddenItem}></div>
           </Grid>
-            {this.state.categoriesDisplayed && (
-              <div>
-                <Typography className={classes.selectCategory}
-                  variant='h5'>Select a Program:</Typography>
-                <Grid container xs={24} >
-                  {this.state.categories.map(element =>
-                    <Grid item xs={4}><CategoryCard element={element}
-                      selectedChapter={this.state.selectedChapter}
-                      setServices={this.setServices}
-                      setCategoryServices={this.setCategoryServices}
-                      setChapterServices={this.setChapterServices}
-                      findService={this.findService}
-                    /></Grid>
-
-                  )}
-                </Grid>
-
-              </div>
-            )}
+          {this.state.categoriesDisplayed && (
             <div>
-              {this.state.chapterServiceDisplay && (
-                <div>
-                  <Typography className={classes.selectServices} variant='h5'>
-                    Available Services:
-                      </Typography>
-                  {this.state.isLoadingServices && (
-                    <CircularProgress />
-                  )}
-                  {!this.state.isLoadingServices && (
-                    <Grid container xs={24} className={classes.stateView}>
-                      {this.state.availableActivities.map(element =>
-                        <Grid item xs={4}>
-                          <Paper className={classes.serviceCard}>{element}</Paper>
-                        </Grid>
-                      )}
-                    </Grid>
+              <Typography className={classes.selectCategory}
+                variant='h5'>Select a Program:</Typography>
+              <Grid container xs={24} >
+                {this.state.categories.map(element =>
+                  <Grid item xs={4}><CategoryCard element={element}
+                    selectedChapter={this.state.selectedChapter}
+                    setServices={this.setServices}
+                    setCategoryServices={this.setCategoryServices}
+                    setChapterServices={this.setChapterServices}
+                    findService={this.findService}
+                    
+                  /></Grid>
 
-                  )}
-                </div>
-              )}
+                )}
+              </Grid>
             </div>
-          
+          )}
+
+            <div>
+              <Typography className={classes.selectServices} variant='h5'>
+                Available Services:
+              </Typography>
+            </div>
+            <Grid container xs={24} className={classes.stateView}>
+                {this.state.availableActivities.map(element =>
+                  <Grid item xs={4}>
+                    <Paper className={classes.serviceCard}>{element}</Paper>
+                  </Grid>
+                )}
+            </Grid>
+
         </Paper>
       </div>
     );
